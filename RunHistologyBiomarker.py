@@ -117,8 +117,8 @@ print(X.shape[0], 'test samples')
 
 
 predDir = '/home/chintan/Desktop/AAPM/ModelsandData/Data/FinalModels/'
-modelFile = (os.path.join(predDir,'AdenovSCC_Final_THEMODEL.h5')) #VGG biomarker
-
+#modelFile = (os.path.join(predDir,'AdenovSCC_Final_THEMODEL.h5')) #VGG biomarker
+modelFile = (os.path.join(predDir,'VGG_AdenovSCC_FINAL.h5')) #VGG biomarker
 
 model = load_model(modelFile)
 
@@ -196,28 +196,45 @@ Other = Histology[:,0]
 
 c = Y_pred[:, 1] ## c = biomaker predictions. bigger numbers are predictive of adenocarcinoma, smaller ones are predictive of SCC, other is in the middle
 
-from scipy.stats import iqr
+#from scipy.stats import iqr
 # seperate predictions into 3 quartiles
-U_iqr = np.percentile(c,42.2) # upper limit of inter thirdile range
-L_iqr = np.percentile(c,21.7) # lower limit of inter thirdile range
+#U_iqr = np.percentile(c,67) # upper limit of inter thirdile range (42.2 for hard code # of adeno)
+#L_iqr = np.percentile(c,33) # lower limit of inter thirdile range (21.7 for hard code # of SCC
 
 
 
-SCC_preds = sum(SCC[c<=L_iqr])/SCC[c<=L_iqr].shape[0]
-ADC_preds = sum(ADC[c>=U_iqr])/ADC[c>=U_iqr].shape[0]
-print('SCC prediction concordance', SCC_preds)
-print('ADC prediction concordance', ADC_preds)
+#SCC_preds = sum(SCC[c<=L_iqr])/SCC[c<=L_iqr].shape[0]
+#ADC_preds = sum(ADC[c>=U_iqr])/ADC[c>=U_iqr].shape[0]
+#print('SCC prediction concordance', SCC_preds)
+#print('ADC prediction concordance', ADC_preds)
 
 
-Other2= Other[c<=U_iqr]
-c2 = c[c<=U_iqr]
+#Other2= Other[c<=U_iqr]
+#c2 = c[c<=U_iqr]
 
-Other3 = Other2[c2>=L_iqr]
+#Other3 = Other2[c2>=L_iqr]
 
-Other_preds = sum(Other3)/Other3.shape[0]
-print('Other prediction concordance', Other_preds)
+#Other_preds = sum(Other3)/Other3.shape[0]
+#print('Other prediction concordance', Other_preds)
 
-print("#Other, #Sample, Original#Other, Original#Sample ", sum(Other3), Other3.shape[0], sum(Other), Other.shape[0])
+#print("#Other, #Sample, Original#Other, Original#Sample ", sum(Other3), Other3.shape[0], sum(Other), Other.shape[0])
 
 #run numbers returned above with: https://www.medcalc.org/calc/comparison_of_proportions.php
+
+Preds_forADC = c[ADC ==1]
+Preds_forSCC = c[SCC ==1]
+Preds_forOther = c[Other ==1]
+
+# Compute the Kruskal-Wallis H-test for independent samples
+from scipy import stats
+stats.kruskal(Preds_forADC, Preds_forSCC, Preds_forOther)
+
+data = [Preds_forADC, Preds_forSCC, Preds_forOther]
+plt.figure()
+plt.boxplot(x="day", y="total_bill", hue="smoker", data, 1, '')
+
+
+
+#import seaborn as sns
+#ax = sns.boxplot(x="day", y="total_bill", hue="smoker",  data=data, palette="Set3")
 
