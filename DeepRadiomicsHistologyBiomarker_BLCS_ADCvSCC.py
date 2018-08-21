@@ -180,7 +180,7 @@ model = load_model(modelFile)
 
 ### Extract features from layer M ###
 
-layer_index = 20# 
+layer_index = 20 # 
 func1 = K.function([ model.layers[0].input , K.learning_phase()  ], [ model.layers[layer_index].output ] )
 
 #Feat = np.empty([1,1,nb_classes]) #when layer_index =24
@@ -199,7 +199,7 @@ Feat = squeeze(Feat)
 Features = Feat[1:Feat.shape[0],:]
 
 ### Dimensionality reduction with PCA and LASSO ####
-num_best_features = 20 #set to 60 to capture 90% of variance 29 for 75% variance, 10 for 50% of variance
+num_best_features = 60 #set to 60 to capture 90% of variance 29 for 75% variance, 10 for 50% of variance
 
 random.seed(10) # set random starting point 
 pca = PCA(n_components = num_best_features)
@@ -213,14 +213,14 @@ plt.ylabel('Cumulative Explained Variance');
 plt.show()
 
 ## LASSO-Cox selection of features with strong association with class
-llas = linear_model.Lasso(alpha= 0.001).fit(F, y)
+llas = linear_model.Lasso(alpha= 0.01).fit(F, y)
 feature_model = SelectFromModel(llas, prefit=True)
 F = feature_model.transform(F)
 
 ## Feature normalization
-#from sklearn import preprocessing 
-#std_scale = preprocessing.StandardScaler().fit(F)
-#F = std_scale.transform(F)
+from sklearn import preprocessing 
+std_scale = preprocessing.StandardScaler().fit(F)
+F = std_scale.transform(F)
 
 ### Machine learning classifiers ###
 test_size = 0.23
@@ -237,10 +237,10 @@ y_test = y_test
 
 #ols = linear_model.Lasso(alpha =0.1) #LASSO
 #ols = RandomForestClassifier() # Random Forrest
-ols = svm.LinearSVC()  #Support vector machine, also try SVC! 
+#ols = svm.LinearSVC()  #Support vector machine, also try SVC! 
 #ols = svm.SVC(kernel="linear", C=0.01)
 #ols = svm.SVC()
-#ols = KNeighborsClassifier(n_neighbors=5) # set this to odd number 
+ols = KNeighborsClassifier(n_neighbors=5) # set this to odd number 
 
 ml_model = ols.fit(x_train, y_train) #define machine learning model
 
@@ -277,6 +277,7 @@ print('Specificity : ', specificity1)
 
 
 ## plot feature histogram
+plt.figure(2)
 plt.style.use('seaborn-deep')
 plt.hist([F_train[:,7], F_test[:,7]], label=['Train', 'Test'])
 plt.legend(loc='upper right')
