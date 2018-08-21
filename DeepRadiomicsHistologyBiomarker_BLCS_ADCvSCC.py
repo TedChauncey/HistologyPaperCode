@@ -1,6 +1,5 @@
 ### This script allows for prediction of histology using a pre-built biomaker based on ADC vs SCC
-### using this we then tell apart 3 different histologies
-
+### extracting deep features and using machine learning classifiers
 from keras.applications.vgg16 import VGG16
 from keras.preprocessing import image
 from keras.applications.vgg16 import preprocess_input
